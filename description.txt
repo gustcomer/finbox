@@ -1,0 +1,17 @@
+Estas funções procuram dar os primeiros passos na descoberta das funções de extração de dados. Testarei:
+- baixar dados do yahoo
+- baixar dados do google
+- comparar estes dados
+- verificar quais dias a bolsa não funciona
+
+Alguns tickers úteis usados:
+
+^BVSP    Índice ibovespa
+VALE5.SA Vale
+GRND3.SA Grendene
+ABEV3.SA Ambev
+ITUB4.SA Itaú - Unibanco
+PETR4.SA Petrobrás
+EMBR3.SA Embraer
+HGTX3.SA Hering
+BVMF3.SA bovespa
