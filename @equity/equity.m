@@ -24,22 +24,12 @@ classdef equity < handle
             obj.rmean = mean(obj.ret);
             obj.rvar = var(obj.ret,1);
             obj.rsd = sqrt(obj.rvar);
-            obj.semivar = utils.calculateSemivar(obj);
+            obj.semivar = calculateSemivar(obj);
             obj.semisd = sqrt(obj.semivar);
         end
-        function obj = calculateReturns(obj)
-            v = obj.price;
-            obj.ret = 100*(v(2:end)-v(1:end-1))./v(1:end-1);
-        end
-        function p = simulatePrice(obj,ret)
-            nret = length(ret);
-            p = [100; zeros(nret,1)];
-            for count = 2:length(p)
-                p(count) = p(count-1)*(1+ret(count-1)/100);
-            end
-        end
-        function obj = plotHistogram(obj)
-            hist(obj.ret,20);
-        end
+        
+        obj = calculateReturns(obj);
+        p = simulatePrice(obj,ret);
+        obj = plotHistogram(obj);
     end
 end
