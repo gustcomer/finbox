@@ -1,7 +1,3 @@
-petr = stock('PETR4.SA','Jan 1 12','Apr 11 14')
-plot(petr.value)
-datestr(vale.date)
-vale = stock('VALE5.SA','Jan 1 12','Apr 30 14')
-petr = stock('PETR4.SA','Jan 1 12','Apr 11 14',0.00014,ibo)
-report
-fprintf('%1.10f\n',x)
+stock0 = equity([100;101;105;106;107]);
+
+stock1 = equity([2; -1.4; 0.5; 1],'returns');

@@ -1,3 +1,0 @@
-flipud(x)
-ismember
-[l1,l2] = ismember(x,y)
