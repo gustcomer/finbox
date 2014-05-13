@@ -1,6 +1,7 @@
 classdef equity < handle
     properties
         price = 0;
+        date = 0;
         ret = 0;
         nrdays = 0;
         rmean = 0;
@@ -10,15 +11,20 @@ classdef equity < handle
         semisd = 0;
     end
     methods
-        function obj = equity(values,option)
-            if exist('option','var')
-               if strcmp(option,'returns')
+        function obj = equity(varargin)
+            values = varargin{1};
+            if findstringcell(varargin,'returns');
                    obj.ret = values;
                    obj.price = obj.simulatePrice(values);
-               end
             else
                 obj.price = values;
                 obj.calculateReturns();
+            end
+            [has_dates,posdates]=findstringcell(varargin,'dates');
+            if has_dates
+                obj.date = varargin{posdates+1};
+            else
+                obj.date = (1:length(obj.price))';
             end
             obj.nrdays = length(obj.price);
             obj.rmean = mean(obj.ret);
