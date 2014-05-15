@@ -81,7 +81,7 @@ classdef dbinterface
             else
                 volume=0;
             end
-            exp= sprintf('INSERT INTO `ABEV3.SA` (`DATE`, `OPEN`, `CLOSE`, `ADJCLOSE`, `HIGH`, `LOW`, `VOLUME`) VALUES (''%s'', ''%s'', ''%s'', ''%s'', ''%s'', ''%s'', ''%s'');',num2str(date),num2str(open),num2str(close),num2str(adjclose),num2str(high),num2str(low),num2str(volume));
+            exp= sprintf('INSERT INTO `%s` (`DATE`, `OPEN`, `CLOSE`, `ADJCLOSE`, `HIGH`, `LOW`, `VOLUME`) VALUES (''%s'', ''%s'', ''%s'', ''%s'', ''%s'', ''%s'', ''%s'');',name,num2str(date),num2str(open),num2str(close),num2str(adjclose),num2str(high),num2str(low),num2str(volume));
             rs=fetch(exec(obj.conn,exp));
             success=rs;
         end
