@@ -1,3 +1,16 @@
+%% usage
+%dbint = dbinterface('brasil');
+%dbint.createTable(?EMBR3.SA?);
+%dbint.insertEntry(ticker,'date',data(j,1),'open',data(j,2),'close',data(j,3),'adjclose',data(j,4),'high',data(j,5),'low',data(j,6),'volume',data(j,7));
+%dbint.insertEntry('ABEV3.SA','date',15,'open',2,'close',5,'adjclose',4,'high',7,'low',-3,'volume',100);
+%dbint.deleteEntry('ABEV3.SA',13);
+%tables = dbint.getTables();
+%dbint.getPrices('HGTX3.SA',733675,733690)
+%dbint.createInterestTable('di')
+%dbint.insertInterestEntry('di',127,0.02)
+%dbint.deleteEntry('di',127);
+%dbint.getInterest('di?,383738, 383748);
+
 classdef dbinterface
     properties
         conn = 0;
@@ -14,6 +27,18 @@ classdef dbinterface
         function obj = createTable(obj,name)
             exp= sprintf('CREATE TABLE IF NOT EXISTS `%s` (`DATE` int(11) NOT NULL,`OPEN` double DEFAULT NULL,`CLOSE` double DEFAULT NULL,`ADJCLOSE` double DEFAULT NULL,`HIGH` double DEFAULT NULL,`LOW` double DEFAULT NULL,`VOLUME` int(11) DEFAULT NULL,PRIMARY KEY (`DATE`))  ENGINE=InnoDB DEFAULT CHARSET=latin1;',name);
             fetch(exec(obj.conn,exp));
+        end
+        function obj = createInterestTable(obj,name)
+            exp= sprintf('CREATE TABLE IF NOT EXISTS `%s` (`DATE` int(11) NOT NULL,`RATE` double DEFAULT NULL,PRIMARY KEY (`DATE`))  ENGINE=InnoDB DEFAULT CHARSET=latin1;',name);
+            fetch(exec(obj.conn,exp));
+        end
+        function success = insertInterestEntry(obj,varargin)
+            ticker = varargin{1};
+            date = varargin{2};
+            value = varargin{3};
+            exp= sprintf('INSERT INTO `%s` (`DATE`, `RATE`) VALUES (''%s'', ''%s'');',ticker,num2str(date),num2str(value));
+            rs=fetch(exec(obj.conn,exp));
+            success = rs;
         end
         function obj = deleteTable(obj,name)
             exp= sprintf('DROP TABLE `%s`;',name);
@@ -85,8 +110,36 @@ classdef dbinterface
             rs=fetch(exec(obj.conn,exp));
             success=rs;
         end
-        function success = deleteEntry(obj,name,date)
-            exp= sprintf('DELETE FROM `%s` WHERE DATE = %s;',num2str(name),num2str(date));
+        function success = getentry(obj,varargin)
+            ticker=varargin{1};
+            day = varargin{2};
+            column = varargin{3};
+            exp= sprintf('SELECT %s FROM `%s` WHERE DATE = %s;',column,ticker,num2str(day));
+            rs=fetch(exec(obj.conn,exp));
+            success = rs;
+        end
+        function [dates,prices] = getPrices(obj,varargin)
+            ticker=varargin{1};
+            firstday = varargin{2};
+            lastday = varargin{3};
+            exp= sprintf('SELECT DATE,ADJCLOSE FROM `%s` WHERE DATE BETWEEN %s AND %s;',ticker,num2str(firstday),num2str(lastday));
+            rs=fetch(exec(obj.conn,exp));
+            data = rs.Data;
+            dates = cell2mat(data(:,1));
+            prices = cell2mat(data(:,2));
+        end
+        function [dates,prices] = getInterest(obj,varargin)
+            ticker=varargin{1};
+            firstday = varargin{2};
+            lastday = varargin{3};
+            exp= sprintf('SELECT DATE,RATE FROM `%s` WHERE DATE BETWEEN %s AND %s;',ticker,num2str(firstday),num2str(lastday));
+            rs=fetch(exec(obj.conn,exp));
+            data = rs.Data;
+            dates = cell2mat(data(:,1));
+            prices = cell2mat(data(:,2));
+        end
+        function success = deleteEntry(obj,day,date)
+            exp= sprintf('DELETE FROM `%s` WHERE DATE = %s;',num2str(day),num2str(date));
             rs=fetch(exec(obj.conn,exp));
             success = rs;
         end

@@ -1,3 +1,17 @@
+%% usages
+%% Test stocks
+%stock1 = stock([2; -1.4; 0.5; 1],'returns');
+%stock0 = stock([100;101;105;106;107]);
+%stock2 = stock([2; -1.4; 0.5; 1],'returns','rf',0.1);
+%% resolucao exercicio
+%market = stock([1; -0.8; 0; 0.7],'returns','rf',0.1,'ismarket');
+%ativo = stock([2; -1.4; 0.5; 1],'returns','rf',0.1,'market',market);
+%% testes extras
+%ativoincompleto = stock([2; -1.4; 0.5],'returns','dates',[1;2;3;4],'rf',0.1,'market',market);
+%% usando precos
+%market = stock([100; 101; 105; 108],'rf',0.1,'dates',[2;4;5;8],'ismarket');
+%ativo = stock([55; 57; 63; 80],'rf',0.1,'dates',[2;4;5;8],'market',market);
+
 classdef stock < equity
     properties
         rf = 0;

@@ -21,3 +21,5 @@ ativo = stock([2; -1.4; 0.5; 1],'returns','rf',0.1,'market',market);
 
 %% testes extras
 ativoincompleto = stock([2; -1.4; 0.5],'returns','dates',[1;2;3;4],'rf',0.1,'market',market);
+
+calculateRf([4;5;6], [10;12;8])

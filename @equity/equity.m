@@ -1,3 +1,10 @@
+%% usages
+%equity0 = equity([100;101;105;106;107]);
+%equity1 = equity([2; -1.4; 0.5; 1],'returns');
+%equity2 = equity([100;101;105;106;107],'dates',[2;4;7;8;9]);
+%equity3 = equity([1; -0.8; 0; 0.7],'returns','dates',[3;6;7;8;9]);
+%marketequity = equity([1; -0.8; 0; 0.7],'returns');
+
 classdef equity < handle
     properties
         price = 0;

@@ -1,3 +1,3 @@
 function obj = plotHistogram(obj)
-    hist(obj.ret,20);
+    hist(obj.ret);
 end
