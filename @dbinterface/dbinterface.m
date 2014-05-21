@@ -1,6 +1,7 @@
 %% usage
 %dbint = dbinterface('brasil');
 %dbint.createTable(?EMBR3.SA?);
+%dbint.isThere('VOLE5.SA') % retorna 0 pois é VALE
 %dbint.insertEntry(ticker,'date',data(j,1),'open',data(j,2),'close',data(j,3),'adjclose',data(j,4),'high',data(j,5),'low',data(j,6),'volume',data(j,7));
 %dbint.insertEntry('ABEV3.SA','date',15,'open',2,'close',5,'adjclose',4,'high',7,'low',-3,'volume',100);
 %dbint.deleteEntry('ABEV3.SA',13);
@@ -15,6 +16,7 @@ classdef dbinterface
     properties
         conn = 0;
         name = '';
+        webint = 0;
     end
     methods
         function obj = dbinterface(varargin)
@@ -22,6 +24,7 @@ classdef dbinterface
             javaaddpath 'mysql-connector-java-5.1.30-bin.jar';
             address = sprintf('jdbc:mysql://localhost/%s',obj.name);
             obj.conn = database(obj.name, 'root', '', 'com.mysql.jdbc.Driver',address);
+            obj.webint = yahoo();
             
         end
         function obj = createTable(obj,name)
@@ -110,6 +113,24 @@ classdef dbinterface
             rs=fetch(exec(obj.conn,exp));
             success=rs;
         end
+        function success = populate(obj,varargin)
+            tick = varargin{1};
+            first = varargin{2};
+            last = varargin{3};
+            
+            fail = 0;
+            try
+            data = fetch(obj.webint,tick,{'Open','Close','Adj Close','High','Low','Volume'},first,last);
+            catch err
+                fail=1;
+            end
+            
+            if fail==0
+                for j=1:size(data,1)
+                    obj.insertEntry(tick,'date',data(j,1),'open',data(j,2),'close',data(j,3),'adjclose',data(j,4),'high',data(j,5),'low',data(j,6),'volume',data(j,7));
+                end
+            end
+        end
         function success = getentry(obj,varargin)
             ticker=varargin{1};
             day = varargin{2};
@@ -142,6 +163,18 @@ classdef dbinterface
             exp= sprintf('DELETE FROM `%s` WHERE DATE = %s;',num2str(day),num2str(date));
             rs=fetch(exec(obj.conn,exp));
             success = rs;
+        end
+        function day = getLastDay(obj,varargin)
+            ticker=varargin{1};
+            exp= sprintf('SELECT DATE FROM `%s` ORDER BY DATE DESC LIMIT 1',ticker);
+            rs=fetch(exec(obj.conn,exp));
+            day = datestr(rs.Data{1});
+        end
+        function day = getFirstDay(obj,varargin)
+            ticker=varargin{1};
+            exp= sprintf('SELECT DATE FROM `%s` ORDER BY DATE ASC LIMIT 1',ticker);
+            rs=fetch(exec(obj.conn,exp));
+            day = datestr(rs.Data{1});
         end
     end
 end

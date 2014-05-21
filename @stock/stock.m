@@ -52,5 +52,6 @@ classdef stock < equity
         
         obj = initializeRfindexes(obj,rf);
         obj = initializeMarketandRfindexes(obj,rf,market);
+        obj = plot(obj,varargin);
     end
 end
