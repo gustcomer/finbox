@@ -9,6 +9,7 @@ classdef bovespastock < stock
     properties
         ticker = '';
         dbint = 0;
+        fund;
     end
     methods
         function obj = bovespastock(varargin)
@@ -49,14 +50,22 @@ classdef bovespastock < stock
 
             [fdays,fprices] = dbi.getInterest('di',initial,final);
             rf = calculateRf(fdays,fprices);
-            [mdays,mprices] = dbi.getPrices('^BVSP',initial,final);
+            [mdays,mprices] = dbi.getPrices('^BVSP',initial,final,'CLOSE');
             market = stock(mprices,'rf',rf,'dates',mdays,'ismarket');
-            [days,prices] = dbi.getPrices(tick,initial,final);
+            [days,prices] = dbi.getPrices(tick,initial,final,'CLOSE');
                 
             obj = obj@stock(prices,'rf',rf,'dates',days,'market',market);
             obj.dbint = dbi;
             obj.ticker = tick;
+            try
+                obj.fund = obj.getFundamentalHistory();
+            catch err
+                fail = 1; 
+            end
         end
         obj = getDay(obj,varargin);
+        fa = getFundamental(obj,varargin);
+        fh = getFundamentalHistory(obj);
+        obj = plotFund(obj);
     end
 end

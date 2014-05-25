@@ -3,3 +3,4 @@ opcao de usar close value, mac min, etc
 descobrir o que é ibovespa ajustado
 x dar uma embelezada no plot
 x implementar inicializacao com ultimos meses, anos, etc
+fazer uma classe portfolio e calcular as covs com a funcao ewstats

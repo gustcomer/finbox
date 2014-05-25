@@ -11,19 +11,26 @@
 %dbint.insertInterestEntry('di',127,0.02)
 %dbint.deleteEntry('di',127);
 %dbint.getInterest('di?,383738, 383748);
+%dbint.createFundTable('EMBR3.SA')
+%dbint.insertFundEntry('EMBR3.SA',1,2014,23223654,13313991,6785173,8235984,258701)
 
 classdef dbinterface
     properties
         conn = 0;
+        connf = 0;
         name = '';
+        namefund = '';
         webint = 0;
     end
     methods
         function obj = dbinterface(varargin)
             obj.name = varargin{1};
+            obj.namefund = varargin{2};
             javaaddpath 'mysql-connector-java-5.1.30-bin.jar';
             address = sprintf('jdbc:mysql://localhost/%s',obj.name);
             obj.conn = database(obj.name, 'root', '', 'com.mysql.jdbc.Driver',address);
+            addressf = sprintf('jdbc:mysql://localhost/%s',obj.namefund);
+            obj.connf = database(obj.namefund, 'root', '', 'com.mysql.jdbc.Driver',addressf);
             obj.webint = yahoo();
             
         end
@@ -143,7 +150,11 @@ classdef dbinterface
             ticker=varargin{1};
             firstday = varargin{2};
             lastday = varargin{3};
-            exp= sprintf('SELECT DATE,ADJCLOSE FROM `%s` WHERE DATE BETWEEN %s AND %s;',ticker,num2str(firstday),num2str(lastday));
+            if length(varargin)>3
+                exp= sprintf('SELECT DATE,%s FROM `%s` WHERE DATE BETWEEN %s AND %s;',varargin{4},ticker,num2str(firstday),num2str(lastday));
+            else
+                exp= sprintf('SELECT DATE,ADJCLOSE FROM `%s` WHERE DATE BETWEEN %s AND %s;',ticker,num2str(firstday),num2str(lastday));
+            end
             rs=fetch(exec(obj.conn,exp));
             data = rs.Data;
             dates = cell2mat(data(:,1));
@@ -175,6 +186,52 @@ classdef dbinterface
             exp= sprintf('SELECT DATE FROM `%s` ORDER BY DATE ASC LIMIT 1',ticker);
             rs=fetch(exec(obj.conn,exp));
             day = datestr(rs.Data{1});
+        end
+        function obj = createFundTable(obj,name)
+            exp= sprintf('CREATE TABLE IF NOT EXISTS `%s` (`DATE` int(11) DEFAULT NULL,`AT` int(11) DEFAULT NULL,`AC` int(11) DEFAULT NULL,`PC` int(11) DEFAULT NULL,`PL` int(11) DEFAULT NULL,`LL` int(11) DEFAULT NULL, PRIMARY KEY (`DATE`)) ENGINE=InnoDB DEFAULT CHARSET=latin1;',name);
+            fetch(exec(obj.connf,exp));
+        end
+        function is = isThereFund(obj,name)
+            exp= sprintf('SHOW TABLES;');
+            rs=fetch(exec(obj.connf,exp));
+            tables=rs.Data;
+            is=any(ismember(tables,name));
+        end
+        function success = insertFundEntry(obj,varargin)
+            name  = varargin{1};
+            trim = varargin{2};
+            year = varargin{3};
+            date = str2num([num2str(year),num2str(trim)]);
+            at = varargin{4};
+            ac = varargin{5};
+            pc = varargin{6};
+            pl = varargin{7};
+            ll = varargin{8};
+
+            if ~obj.isThereFund(name)
+               obj.createFundTable(name);
+            end
+            
+            exp= sprintf('INSERT INTO `%s` (`DATE`,`AT`,`AC`,`PC`,`PL`,`LL`) VALUES (''%s'',''%s'', ''%s'', ''%s'', ''%s'', ''%s'');',name,num2str(date),num2str(at),num2str(ac),num2str(pc),num2str(pl),num2str(ll) );
+            rs=fetch(exec(obj.connf,exp));
+            success=rs;
+        end
+        function res = getFundEntry(obj,varargin)
+            ticker=varargin{1};
+            year = varargin{2};
+            trim = varargin{3};
+            date = str2num([num2str(year),num2str(trim)]);
+            
+            exp= sprintf('SELECT * FROM `%s` WHERE DATE = %s;',ticker,num2str(date));
+            result=fetch(exec(obj.connf,exp));
+            res = result.Data;
+        end
+        function res = getFundHistory(obj,varargin)
+            ticker=varargin{1};
+            
+            exp= sprintf('SELECT * FROM `%s`;',ticker);
+            result=fetch(exec(obj.connf,exp));
+            res = result.Data;
         end
     end
 end
